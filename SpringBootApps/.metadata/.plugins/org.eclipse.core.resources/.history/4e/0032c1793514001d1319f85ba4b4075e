@@ -1,0 +1,80 @@
+package com.example.RoleBasedAuthorization.controller;
+
+import java.security.Principal;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.example.RoleBasedAuthorization.entity.BloodRequest;
+import com.example.RoleBasedAuthorization.service.BloodRequestService;
+
+
+@RestController
+@RequestMapping("/request")
+public class BloodRequestController {
+	
+
+	@Autowired
+	private BloodRequestService postService;
+	
+	
+	
+	@PostMapping("/blood")
+	@PreAuthorize("hasAuthority('DOCTOR')")
+	public String requestBlood(@RequestBody BloodRequest post, Principal principal) {
+	postService.doctorBloodRequest(post, principal);
+		return principal.getName() +  " You have successfully requested for blood status is PENDING at the moment";
+		
+	}
+	
+	
+	
+	//METHOD TO APPROVE A single BLOOD REQUEST at a time 
+	@GetMapping("/approvePost/{postId}")
+    @PreAuthorize("hasAuthority('LABTECHNICIAN') or hasAuthority('DOCTOR')")
+	public String approveBloodRequest(@PathVariable int postId) {
+		// NB: If a value returns optional and you need to get a variable out of it append dot get to it. (.get())
+		postService.approvedBloodRequest(postId);
+		return "Post Approved";
+	}
+	
+	//METHOD TO APPROVE BULK REQUEST.
+	@GetMapping("/approveAll")
+    @PreAuthorize("hasAuthority('LABTECHNICIAN') or hasAuthority('DOCTOR')")
+	public String approveAll() {
+		postService.approveAll();
+		return " You have approved all Pending post";
+	}
+	
+	//METHODS TO REJECT BLOOD REQUEST
+	@GetMapping("/rejectPost/{postId}")
+    @PreAuthorize("hasAuthority('LABTECHNICIAN') or hasAuthority('DOCTOR')")
+	public String rejectBloodRequest(@PathVariable int postId) {
+		// NB: If a value returns optional and you need to get a variable out of it append dot get to it. (.get())
+		postService.rejectedBloodRequest(postId);
+		return "Post Rejected";
+	}
+	
+	//METHOD TO REJECT BULK POSTS.
+		@GetMapping("/rejectAll")
+	    @PreAuthorize("hasAuthority('LABTECHNICIAN') or hasAuthority('DOCTOR')")
+		public String rejecteAll() {
+		postService.rejectedAll();
+			return " You have rejected all Pending post";
+		}
+		
+		//RETURN ONLY ALL APPROVED POST
+		@GetMapping("/viewAllApproved")
+		public List<BloodRequest> viewAll(){
+		return postService.viewedAll();
+		}
+
+
+}

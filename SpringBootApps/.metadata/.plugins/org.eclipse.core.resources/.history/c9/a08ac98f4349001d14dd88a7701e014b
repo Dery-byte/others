@@ -1,0 +1,23 @@
+package com.programming.techie.springngblog.service;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
+@Data
+@AllArgsConstructor
+public class AuthenticationResponse {
+    public AuthenticationResponse(String authenticationToken2, String username2) {
+    	super();
+		this.authenticationToken = authenticationToken;
+		this.username = username;
+	}
+    
+    
+	private String authenticationToken;
+    private String username;
+	
+    
+    
+    
+    
+}
